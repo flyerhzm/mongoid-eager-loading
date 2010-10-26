@@ -1,7 +1,5 @@
 module Mongoid
-  module Eager
-    module Loading
-      VERSION = "0.0.1"
-    end
+  module EagerLoading
+    VERSION = "0.0.1"
   end
 end

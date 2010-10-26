@@ -1,7 +1,8 @@
+require 'mongoid-eager-loading/mongoid/criterion/eager_loading'
+require 'mongoid-eager-loading/mongoid/criteria'
+require 'mongoid-eager-loading/mongoid/finders'
+
 module Mongoid
-  module Eager
-    module Loading
-      # Your code goes here...
-    end
+  module EagerLoading
   end
 end
