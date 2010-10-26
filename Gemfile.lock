@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     mongoid-eager-loading (0.0.1)
-      mongoid (~> 2.0.0.beta.19)
+      mongoid (~> 2.0.0.beta.18)
 
 GEM
   remote: http://rubygems.org/
@@ -48,7 +48,7 @@ DEPENDENCIES
   bson_ext
   bundler (>= 1.0.0)
   mocha
-  mongoid (~> 2.0.0.beta.19)
+  mongoid (~> 2.0.0.beta.18)
   mongoid-eager-loading!
   rspec (~> 2.0.0)
   watchr
