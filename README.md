@@ -16,9 +16,11 @@ define it in your Gemfile
 
 include the module after Mongoid::Document
 
-    class User
+    class Post
       include Mongoid::Document
       include Mongoid::EagerLoading
+      
+      referenced_in :user
     end
 
 then you can use the eager loading like
@@ -26,10 +28,12 @@ then you can use the eager loading like
     Post.includes(:user)
     Post.includes(:user, :comment)
     
+eager loading can be only used on referenced_in, references_one and references_many associations.
+    
 Benchmark
 ---------
 
-I also ruun a [benchmark][1] on my local computer, the result is as follows
+I also run a [benchmark][1] on my local computer, the result is as follows
 
     Starting benchmark...
                                                                       user     system      total        real
