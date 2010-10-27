@@ -14,11 +14,10 @@ define it in your Gemfile
 
     gem "mongoid-eager-loading"
 
-include the module after Mongoid::Document
+suppose you have a mongoid model Post
 
     class Post
       include Mongoid::Document
-      include Mongoid::EagerLoading
       
       referenced_in :user
       references_many :comments
