@@ -21,12 +21,13 @@ include the module after Mongoid::Document
       include Mongoid::EagerLoading
       
       referenced_in :user
+      references_many :comments
     end
 
 then you can use the eager loading like
 
     Post.includes(:user)
-    Post.includes(:user, :comment)
+    Post.includes(:user, :comments)
     
 eager loading can be only used on referenced_in, references_one and references_many associations.
     
