@@ -18,7 +18,12 @@ describe Mongoid::Criterion::EagerLoading do
 
   describe "#preload" do
 
-    before do
+    before :all do
+      Preference.destroy_all
+      Post.destroy_all
+      Game.destroy_all
+      Person.destroy_all
+      
       person1 = Person.create(:title => "Sir", :age => 100, :aliases => ["D", "Durran"], :ssn => "666666666")
       person2 = Person.create(:title => "Madam", :age => 1, :ssn => "098-76-5434")
 
