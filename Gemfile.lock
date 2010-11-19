@@ -1,17 +1,16 @@
 PATH
   remote: .
   specs:
-    mongoid-eager-loading (0.1.0)
-      mongoid (~> 2.0.0.beta.19)
+    mongoid-eager-loading (0.1.1)
 
 GEM
   remote: http://rubygems.org/
   specs:
-    activemodel (3.0.1)
-      activesupport (= 3.0.1)
+    activemodel (3.0.3)
+      activesupport (= 3.0.3)
       builder (~> 2.1.2)
-      i18n (~> 0.4.1)
-    activesupport (3.0.1)
+      i18n (~> 0.4)
+    activesupport (3.0.3)
     bson (1.1.1)
     bson_ext (1.1.1)
     builder (2.1.2)
@@ -21,10 +20,11 @@ GEM
       rake
     mongo (1.1.1)
       bson (>= 1.1.1)
-    mongoid (2.0.0.alpha)
-      activemodel (>= 3.0.pre)
-      mongo (>= 0.19.1)
-      will_paginate (>= 3.0.pre)
+    mongoid (2.0.0.beta.20)
+      activemodel (~> 3.0)
+      mongo (~> 1.1)
+      tzinfo (~> 0.3.22)
+      will_paginate (~> 3.0.pre)
     rake (0.8.7)
     rspec (2.0.1)
       rspec-core (~> 2.0.1)
@@ -36,6 +36,7 @@ GEM
     rspec-mocks (2.0.1)
       rspec-core (~> 2.0.1)
       rspec-expectations (~> 2.0.1)
+    tzinfo (0.3.23)
     watchr (0.7)
     will_paginate (3.0.pre2)
 
@@ -47,7 +48,7 @@ DEPENDENCIES
   bundler (>= 1.0.0)
   mocha
   mongo (~> 1.1.1)
-  mongoid (~> 2.0.0.beta.19)
+  mongoid (= 2.0.0.beta.20)
   mongoid-eager-loading!
   rspec (~> 2.0.0)
   watchr
