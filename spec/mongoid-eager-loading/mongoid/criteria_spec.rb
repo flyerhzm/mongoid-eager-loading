@@ -23,5 +23,12 @@ describe Mongoid::Criteria do
       criteria.collect(&:title).should == ["Sir", "Madam"]
       criteria.collect(&:game).should == [@person1.game, @person2.game]
     end
+
+    it "empty parent objects with include" do
+      Game.destroy_all
+      Person.destroy_all
+      criteria = Person.includes(:game)
+      criteria.collect(&:game).should == []
+    end
   end
 end

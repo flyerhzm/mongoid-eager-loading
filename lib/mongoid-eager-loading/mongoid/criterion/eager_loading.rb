@@ -18,12 +18,13 @@ module Mongoid
       end
 
       def preload(documents)
+        return if documents.blank?
         document_class = documents.first.class
         @eager_loadings.each do |eager_loading|
           setup_associations(documents, association_reflection(document_class, eager_loading))
         end
       end
-      
+
       private
         def ignore_includes
           @eager_loadings = nil
