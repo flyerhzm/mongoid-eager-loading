@@ -10,7 +10,7 @@ module Mongoid
       # <tt>criteria.includes(:user, :post)</tt>
       #
       # Returns: <tt>self</tt>
-      attr_accessor :eager_loadings, :id_document_map, :id_associations_map
+      attr_accessor :eager_loadings, :id_documents_map, :id_associations_map
 
       def includes(*options)
         @eager_loadings = options
@@ -49,19 +49,21 @@ module Mongoid
         def setup_associations_with_ids(documents, reflection, one=true)
           ids = []
           documents.each do |document|
-            id_document_map[document.id] = document
+            add_id_document(document.id, document)
             ids << document.id if document.id
           end
 
           association_class = reflection.name.singularize.camelize.constantize
           ignore_includes
-          eager_associations = association_class.where(reflection.foreign_key.to_sym.in => ids).to_a
+          eager_associations = association_class.where(reflection.foreign_key.to_sym.in => ids.uniq).to_a
           eager_associations.each do |eager_association|
             add_id_association(eager_association.send(reflection.foreign_key), eager_association)
           end
 
-          id_document_map.each do |id, document|
-            document.send("#{reflection.name}=", one ? id_associations_map[id].first : id_associations_map[id])
+          id_documents_map.each do |id, documents|
+            documents.each do |document|
+              document.send("#{reflection.name}=", one ? id_associations_map[id].first : id_associations_map[id])
+            end
           end
         end
 
@@ -71,11 +73,11 @@ module Mongoid
           documents.each do |document|
             foreign_key_value = document.send(foreign_key_name)
             if one
-              id_document_map[foreign_key_value] = document
+              add_id_document(foreign_key_value, document)
               ids << foreign_key_value if foreign_key_value
             elsif foreign_key_value
               foreign_key_value.each do |fkv|
-                id_document_map[fkv] = document
+                add_id_document(fkv, document)
                 ids << fkv if fkv
               end
             end
@@ -83,29 +85,36 @@ module Mongoid
 
           association_class = reflection.name.singularize.camelize.constantize
           ignore_includes
-          eager_associations = association_class.find(ids).to_a
+          eager_associations = association_class.find(ids.uniq).to_a
           eager_associations.each do |eager_association|
             add_id_association(eager_association.id, eager_association)
           end
 
-          id_document_map.each do |id, document|
-            foreign_key_value = document.send(foreign_key_name)
-            associations = \
-              if one
-                id_associations_map[foreign_key_value].first
-              else
-                foreign_key_value.collect { |fkv| id_associations_map[fkv] }.flatten.uniq
-              end
-            document.send("#{reflection.name}=", associations)
+          id_documents_map.each do |id, documents|
+            documents.each do |document|
+              foreign_key_value = document.send(foreign_key_name)
+              associations = \
+                if one
+                  id_associations_map[foreign_key_value].first
+                else
+                  foreign_key_value.collect { |fkv| id_associations_map[fkv] }.flatten.uniq
+                end
+              document.send("#{reflection.name}=", associations)
+            end
           end
         end
 
-        def id_document_map
-          @id_doccument_map ||= {}
+        def id_documents_map
+          @id_documents_map ||= {}
         end
 
         def id_associations_map
           @id_associations_map ||= {}
+        end
+
+        def add_id_document(id, document)
+          id_documents_map[id] ||= []
+          id_documents_map[id] << document
         end
 
         def add_id_association(id, association)

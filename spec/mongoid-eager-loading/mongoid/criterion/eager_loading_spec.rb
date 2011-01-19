@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Criterion::EagerLoading do
 
   describe "#includes" do
-    
+
     it "should return self" do
       criteria = Mongoid::Criteria.new(Person)
       criteria.includes(:game, :posts).should == criteria
@@ -23,22 +23,22 @@ describe Mongoid::Criterion::EagerLoading do
       Post.destroy_all
       Game.destroy_all
       Person.destroy_all
-      
-      person1 = Person.create(:title => "Sir", :age => 100, :aliases => ["D", "Durran"], :ssn => "666666666")
-      person2 = Person.create(:title => "Madam", :age => 1, :ssn => "098-76-5434")
 
-      person1.create_game(:score => 10)
-      person2.create_game(:score => 20)
-      
-      person1.posts.create(:title => "post1")
-      person1.posts.create(:title => "post2")
-      person2.posts.create(:title => "post3")
-      person2.posts.create(:title => "post4")
-      
-      person1.preferences.create(:name => "preference1")
-      person1.preferences.create(:name => "preference2")
-      person2.preferences.create(:name => "preference3")
-      person2.preferences.create(:name => "preference4")
+      @person1 = Person.create(:title => "Sir", :age => 100, :aliases => ["D", "Durran"], :ssn => "666666666")
+      @person2 = Person.create(:title => "Madam", :age => 1, :ssn => "098-76-5434")
+
+      @game1 = @person1.create_game(:score => 10)
+      @game2 = @person2.create_game(:score => 20)
+
+      @post1 = @person1.posts.create(:title => "post1")
+      @post2 = @person1.posts.create(:title => "post2")
+      @post3 = @person2.posts.create(:title => "post3")
+      @post4 = @person2.posts.create(:title => "post4")
+
+      @preference1 = @person1.preferences.create(:name => "preference1")
+      @preference2 = @person1.preferences.create(:name => "preference2")
+      @preference3 = @person2.preferences.create(:name => "preference3")
+      @preference4 = @person2.preferences.create(:name => "preference4")
     end
 
     it "preload references_one association" do
@@ -48,38 +48,50 @@ describe Mongoid::Criterion::EagerLoading do
       complex = stub(:key => :person_id, :operator => "in")
       Mongoid::Criterion::Complex.expects(:new).with(:key => :person_id, :operator => "in").returns(complex)
       Game.expects(:where).with(complex => people.collect(&:id)).returns(games)
-      
+
       criteria = Mongoid::Criteria.new(Person)
       criteria.includes(:game)
       criteria.preload(people)
 
-      people.first.game.should == games.first
-      people.last.game.should == games.last
+      id_documents_map = criteria.send(:id_documents_map)
+      id_documents_map[@person1.id].should == [@person1]
+      id_documents_map[@person2.id].should == [@person2]
+
+      id_associations_map = criteria.send(:id_associations_map)
+      id_associations_map[@person1.id].should == [@game1]
+      id_associations_map[@person2.id].should == [@game2]
+
+      @person1.game.should == @game1
+      @person2.game.should == @game2
     end
 
     it "preload references_many association" do
       people = Person.all.to_a
       posts = Post.all.to_a
-      person1_posts = Post.where(:person_id => people.first.id).to_a
-      person2_posts = Post.where(:person_id => people.last.id).to_a
 
       complex = stub(:key => :person_id, :operator => "in")
       Mongoid::Criterion::Complex.expects(:new).with(:key => :person_id, :operator => "in").returns(complex)
       Post.expects(:where).with(complex => people.collect(&:id)).returns(posts)
-      
+
       criteria = Mongoid::Criteria.new(Person)
       criteria.includes(:posts)
       criteria.preload(people)
 
-      people.first.posts.should == person1_posts
-      people.last.posts.should == person2_posts
+      id_documents_map = criteria.send(:id_documents_map)
+      id_documents_map[@person1.id].should == [@person1]
+      id_documents_map[@person2.id].should == [@person2]
+
+      id_associations_map = criteria.send(:id_associations_map)
+      id_associations_map[@person1.id].should == [@post1, @post2]
+      id_associations_map[@person2.id].should == [@post3, @post4]
+
+      @person1.posts.should == [@post1, @post2]
+      @person2.posts.should == [@post3, @post4]
     end
 
     it "preload references_many_as_array association" do
       people = Person.all.to_a
       preferences = Preference.all.to_a
-      person1_preferences = Preference.find(people.first.preference_ids).to_a
-      person2_preferences = Preference.find(people.last.preference_ids).to_a
 
       Preference.expects(:find).with(preferences.collect(&:id)).returns(preferences)
 
@@ -87,22 +99,68 @@ describe Mongoid::Criterion::EagerLoading do
       criteria.includes(:preferences)
       criteria.preload(people)
 
-      people.first.preferences.should == person1_preferences
-      people.last.preferences.should == person2_preferences
+      id_documents_map = criteria.send(:id_documents_map)
+      id_documents_map[@preference1.id].should == [@person1]
+      id_documents_map[@preference2.id].should == [@person1]
+      id_documents_map[@preference3.id].should == [@person2]
+      id_documents_map[@preference4.id].should == [@person2]
+
+      id_associations_map = criteria.send(:id_associations_map)
+      id_associations_map[@preference1.id].should == [@preference1]
+      id_associations_map[@preference2.id].should == [@preference2]
+      id_associations_map[@preference3.id].should == [@preference3]
+      id_associations_map[@preference4.id].should == [@preference4]
+
+      @person1.preferences.should == [@preference1, @preference2]
+      @person2.preferences.should == [@preference3, @preference4]
     end
 
-    it "preload referenced_in association" do
-      people = Person.all.to_a
-      games = Game.all.to_a
+    context "referenced_in" do
+      it "preload referenced_in association to references_one" do
+        people = Person.all.to_a
+        games = Game.all.to_a
 
-      Person.expects(:find).with(people.collect(&:id)).returns(people)
-      
-      criteria = Mongoid::Criteria.new(Game)
-      criteria.includes(:person)
-      criteria.preload(games)
+        Person.expects(:find).with(people.collect(&:id)).returns(people)
 
-      people.first.game.should == games.first
-      people.last.game.should == games.last
+        criteria = Mongoid::Criteria.new(Game)
+        criteria.includes(:person)
+        criteria.preload(games)
+
+        id_documents_map = criteria.send(:id_documents_map)
+        id_documents_map[@person1.id].should == [@game1]
+        id_documents_map[@person2.id].should == [@game2]
+
+        id_associations_map = criteria.send(:id_associations_map)
+        id_associations_map[@person1.id].should == [@person1]
+        id_associations_map[@person2.id].should == [@person2]
+
+        @game1.person.should == @person1
+        @game2.person.should == @person2
+      end
+
+      it "preload referenced_in association to references_many" do
+        people = Person.all.to_a
+        posts = Post.all.to_a
+
+        Person.expects(:find).with(people.collect(&:id)).returns(people)
+
+        criteria = Mongoid::Criteria.new(Game)
+        criteria.includes(:person)
+        criteria.preload(posts)
+
+        id_documents_map = criteria.send(:id_documents_map)
+        id_documents_map[@person1.id].should == [@post1, @post2]
+        id_documents_map[@person2.id].should == [@post3, @post4]
+
+        id_associations_map = criteria.send(:id_associations_map)
+        id_associations_map[@person1.id].should == [@person1]
+        id_associations_map[@person2.id].should == [@person2]
+
+        @post1.person.should == @person1
+        @post2.person.should == @person1
+        @post3.person.should == @person2
+        @post4.person.should == @person2
+      end
     end
   end
 end
