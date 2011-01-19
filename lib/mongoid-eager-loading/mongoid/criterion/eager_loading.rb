@@ -62,7 +62,7 @@ module Mongoid
 
           id_documents_map.each do |id, documents|
             documents.each do |document|
-              document.send("#{reflection.name}=", one ? id_associations_map[id].first : id_associations_map[id])
+              document.instance_variable_set("@#{reflection.name}", one ? id_associations_map[id].first : id_associations_map[id])
             end
           end
         end
@@ -99,7 +99,7 @@ module Mongoid
                 else
                   foreign_key_value.collect { |fkv| id_associations_map[fkv] }.flatten.uniq
                 end
-              document.send("#{reflection.name}=", associations)
+              document.instance_variable_set("@#{reflection.name}", associations)
             end
           end
         end
