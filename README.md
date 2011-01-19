@@ -5,7 +5,7 @@ mongoid-eager-loading adds the eager loading feature for mongoid.
 
 Originally it is my [pull request][0] for mongoid, but it is not accepted yet, so I created this gem to get the eager loading benefits easily for my projects.
 
-I only test it in mongoid-2.0.0.beta.19, maybe you can try it on other mongoid version, and let me know if it works fine.
+I only test it in mongoid 2.0.0.beta.19 and 2.0.0.beta.20, maybe you can try it on other mongoid version, and let me know if it works fine.
 
 Usage
 -----
