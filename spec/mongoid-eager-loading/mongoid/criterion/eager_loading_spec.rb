@@ -45,10 +45,6 @@ describe Mongoid::Criterion::EagerLoading do
       people = Person.all.to_a
       games = Game.all.to_a
 
-      complex = stub(:key => :person_id, :operator => "in")
-      Mongoid::Criterion::Complex.expects(:new).with(:key => :person_id, :operator => "in").returns(complex)
-      Game.expects(:where).with(complex => people.collect(&:id)).returns(games)
-
       criteria = Mongoid::Criteria.new(Person)
       criteria.includes(:game)
       criteria.preload(people)
@@ -69,10 +65,6 @@ describe Mongoid::Criterion::EagerLoading do
       people = Person.all.to_a
       posts = Post.all.to_a
 
-      complex = stub(:key => :person_id, :operator => "in")
-      Mongoid::Criterion::Complex.expects(:new).with(:key => :person_id, :operator => "in").returns(complex)
-      Post.expects(:where).with(complex => people.collect(&:id)).returns(posts)
-
       criteria = Mongoid::Criteria.new(Person)
       criteria.includes(:posts)
       criteria.preload(people)
@@ -92,8 +84,6 @@ describe Mongoid::Criterion::EagerLoading do
     it "preload references_many_as_array association" do
       people = Person.all.to_a
       preferences = Preference.all.to_a
-
-      Preference.expects(:find).with(preferences.collect(&:id)).returns(preferences)
 
       criteria = Mongoid::Criteria.new(Person)
       criteria.includes(:preferences)
@@ -120,8 +110,6 @@ describe Mongoid::Criterion::EagerLoading do
         people = Person.all.to_a
         games = Game.all.to_a
 
-        Person.expects(:find).with(people.collect(&:id)).returns(people)
-
         criteria = Mongoid::Criteria.new(Game)
         criteria.includes(:person)
         criteria.preload(games)
@@ -141,8 +129,6 @@ describe Mongoid::Criterion::EagerLoading do
       it "preload referenced_in association to references_many" do
         people = Person.all.to_a
         posts = Post.all.to_a
-
-        Person.expects(:find).with(people.collect(&:id)).returns(people)
 
         criteria = Mongoid::Criteria.new(Game)
         criteria.includes(:person)
