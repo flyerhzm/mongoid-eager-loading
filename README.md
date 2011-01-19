@@ -18,7 +18,7 @@ suppose you have a mongoid model Post
 
     class Post
       include Mongoid::Document
-      
+
       referenced_in :user
       references_many :comments
     end
@@ -27,9 +27,9 @@ then you can use the eager loading like
 
     Post.includes(:user)
     Post.includes(:user, :comments)
-    
+
 eager loading can be only used on referenced_in, references_one and references_many associations.
-    
+
 Benchmark
 ---------
 
@@ -37,12 +37,13 @@ I also run a [benchmark][1] on my local computer, the result is as follows
 
     Starting benchmark...
                                                                       user     system      total        real
-    Finding 10 posts with person, without eager loading           0.010000   0.000000   0.010000 (  0.006538)
-    Finding 10 posts with person, with eager loading              0.000000   0.000000   0.000000 (  0.005235)
-    Finding 50 posts with person, without eager loading           0.020000   0.000000   0.020000 (  0.027912)
-    Finding 50 posts with person, with eager loading              0.020000   0.000000   0.020000 (  0.020103)
-    Finding 100 posts with person, without eager loading          0.040000   0.000000   0.040000 (  0.055197)
-    Finding 100 posts with person, with eager loading             0.030000   0.010000   0.040000 (  0.040644)
+    Finding 10 posts with person, without eager loading           0.010000   0.000000   0.010000 (  0.005121)
+    Finding 10 posts with person, with eager loading              0.000000   0.000000   0.000000 (  0.001886)
+    Finding 50 posts with person, without eager loading           0.020000   0.000000   0.020000 (  0.021442)
+    Finding 50 posts with person, with eager loading              0.000000   0.000000   0.000000 (  0.005267)
+    Finding 100 posts with person, without eager loading          0.050000   0.000000   0.050000 (  0.057718)
+    Finding 100 posts with person, with eager loading             0.010000   0.000000   0.010000 (  0.010141)
+
 
 Author
 ------
