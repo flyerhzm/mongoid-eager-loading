@@ -92,7 +92,7 @@ module Mongoid
                 if key_value.is_a?(Array)
                   key_value.collect { |v| id_associations_map[v] }
                 else
-                  id_associations_map[key_value].first
+                  id_associations_map[key_value] ? id_associations_map[key_value].first : nil
                 end
               document.instance_variable_set("@#{reflection.name}", associations)
             end
@@ -100,7 +100,8 @@ module Mongoid
         end
 
         def to_array(value)
-          value.is_a?(Array) ? value : [value]
+          array = value.is_a?(Array) ? value : [value]
+          array.compact
         end
 
         def id_documents_map
