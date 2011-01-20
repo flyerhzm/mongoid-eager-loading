@@ -1,5 +1,7 @@
-class Location
+class Business
   include Mongoid::Document
+
+  set_database :secondary
+
   field :name
-  embedded_in :address
 end
