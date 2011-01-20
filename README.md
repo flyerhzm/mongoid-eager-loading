@@ -37,13 +37,14 @@ I also run a [benchmark][1] on my local computer, the result is as follows
 
     Starting benchmark...
                                                                       user     system      total        real
-    Finding 10 posts with person, without eager loading           0.010000   0.000000   0.010000 (  0.005121)
-    Finding 10 posts with person, with eager loading              0.000000   0.000000   0.000000 (  0.001886)
-    Finding 50 posts with person, without eager loading           0.020000   0.000000   0.020000 (  0.021442)
-    Finding 50 posts with person, with eager loading              0.000000   0.000000   0.000000 (  0.005267)
-    Finding 100 posts with person, without eager loading          0.050000   0.000000   0.050000 (  0.057718)
-    Finding 100 posts with person, with eager loading             0.010000   0.000000   0.010000 (  0.010141)
-
+    Finding 10 posts with person, without eager loading           0.000000   0.000000   0.000000 (  0.005373)
+    Finding 10 posts with person, with eager loading              0.010000   0.000000   0.010000 (  0.002984)
+    Finding 50 posts with person, without eager loading           0.010000   0.000000   0.010000 (  0.022207)
+    Finding 50 posts with person, with eager loading              0.010000   0.000000   0.010000 (  0.006831)
+    Finding 100 posts with person, without eager loading          0.040000   0.000000   0.040000 (  0.050991)
+    Finding 100 posts with person, with eager loading             0.010000   0.000000   0.010000 (  0.012867)
+    Finding 1000 posts with person, without eager loading         0.390000   0.050000   0.440000 (  0.477983)
+    Finding 1000 posts with person, with eager loading            0.120000   0.010000   0.130000 (  0.128879)
 
 Author
 ------

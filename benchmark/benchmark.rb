@@ -37,21 +37,20 @@ Benchmark.bm(60) do |bm|
   bm.report("Finding 10 posts with person, without eager loading") do
     Post.limit(10).each { |p| p.person.name }
   end
-
   bm.report("Finding 10 posts with person, with eager loading") do
     Post.limit(10).includes(:person).each { |p| p.person.name }
   end
+
   bm.report("Finding 50 posts with person, without eager loading") do
     Post.limit(50).each { |p| p.person.name }
   end
-
   bm.report("Finding 50 posts with person, with eager loading") do
     Post.limit(50).includes(:person).each { |p| p.person.name }
   end
+
   bm.report("Finding 100 posts with person, without eager loading") do
     Post.limit(100).each { |p| p.person.name }
   end
-
   bm.report("Finding 100 posts with person, with eager loading") do
     Post.limit(100).includes(:person).each { |p| p.person.name }
   end
@@ -59,7 +58,6 @@ Benchmark.bm(60) do |bm|
   bm.report("Finding 1000 posts with person, without eager loading") do
     Post.limit(1000).each { |p| p.person.name }
   end
-
   bm.report("Finding 1000 posts with person, with eager loading") do
     Post.limit(1000).includes(:person).each { |p| p.person.name }
   end
