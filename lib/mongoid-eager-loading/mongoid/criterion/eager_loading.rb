@@ -48,61 +48,59 @@ module Mongoid
         end
 
         def setup_associations_with_ids(documents, reflection, one=true)
-          ids = []
-          documents.each do |document|
-            add_id_document(document.id, document)
-            ids << document.id if document.id
-          end
+          ids = association_ids(documents, reflection)
 
-          association_class = reflection.class_name.constantize
           ignore_includes
-          eager_associations = association_class.where(reflection.foreign_key.to_sym.in => ids.uniq).to_a
+          eager_associations = reflection.klass.where(reflection.foreign_key.to_sym.in => ids.uniq).to_a
           eager_associations.each do |eager_association|
             add_id_association(eager_association.send(reflection.foreign_key), eager_association)
           end
 
-          id_documents_map.each do |id, documents|
-            documents.each do |document|
-              document.instance_variable_set("@#{reflection.name}", one ? id_associations_map[id].first : id_associations_map[id])
-            end
-          end
+          assign_associations(documents, reflection)
         end
 
         def setup_associations_with_foreign_keys(documents, reflection, one)
-          ids = []
-          foreign_key_name = reflection.foreign_key
-          documents.each do |document|
-            foreign_key_value = document.send(foreign_key_name)
-            if one
-              add_id_document(foreign_key_value, document)
-              ids << foreign_key_value if foreign_key_value
-            elsif foreign_key_value
-              foreign_key_value.each do |fkv|
-                add_id_document(fkv, document)
-                ids << fkv if fkv
-              end
-            end
-          end
+          ids = association_ids(documents, reflection)
 
-          association_class = reflection.class_name.constantize
           ignore_includes
-          eager_associations = association_class.find(ids.uniq).to_a
+          eager_associations = reflection.klass.find(ids.uniq).to_a
           eager_associations.each do |eager_association|
             add_id_association(eager_association.id, eager_association)
           end
 
+          assign_associations(documents, reflection)
+        end
+
+        def association_ids(documents, reflection)
+          ids = []
+          key_name = reflection.key
+          documents.each do |document|
+            key_value = document.send(key_name)
+            to_array(key_value).each do |v|
+              add_id_document(v, document)
+              ids << v
+            end
+          end
+          ids
+        end
+
+        def assign_associations(documents, reflection)
           id_documents_map.each do |id, documents|
             documents.each do |document|
-              foreign_key_value = document.send(foreign_key_name)
+              key_value = document.send(reflection.key)
               associations = \
-                if one
-                  id_associations_map[foreign_key_value].first
+                if key_value.is_a?(Array)
+                  key_value.collect { |v| id_associations_map[v] }
                 else
-                  foreign_key_value.collect { |fkv| id_associations_map[fkv] }.flatten.uniq
+                  id_associations_map[key_value].first
                 end
               document.instance_variable_set("@#{reflection.name}", associations)
             end
           end
+        end
+
+        def to_array(value)
+          value.is_a?(Array) ? value : [value]
         end
 
         def id_documents_map
