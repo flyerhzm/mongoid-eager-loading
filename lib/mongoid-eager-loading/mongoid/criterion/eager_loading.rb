@@ -35,13 +35,14 @@ module Mongoid
         end
 
         def setup_associations(documents, reflection)
-          if reflection.association == Mongoid::Associations::ReferencesOne
+          case reflection.macro
+          when :references_one
             setup_associations_with_ids(documents, reflection, true)
-          elsif reflection.association == Mongoid::Associations::ReferencesMany
+          when :references_many
             setup_associations_with_ids(documents, reflection, false)
-          elsif reflection.association == Mongoid::Associations::ReferencesManyAsArray
+          when :references_and_referenced_in_many
             setup_associations_with_foreign_keys(documents, reflection, false)
-          elsif reflection.association == Mongoid::Associations::ReferencedIn
+          when :referenced_in
             setup_associations_with_foreign_keys(documents, reflection, true)
           end
         end
@@ -53,7 +54,7 @@ module Mongoid
             ids << document.id if document.id
           end
 
-          association_class = reflection.name.singularize.camelize.constantize
+          association_class = reflection.class_name.constantize
           ignore_includes
           eager_associations = association_class.where(reflection.foreign_key.to_sym.in => ids.uniq).to_a
           eager_associations.each do |eager_association|
@@ -83,7 +84,7 @@ module Mongoid
             end
           end
 
-          association_class = reflection.name.singularize.camelize.constantize
+          association_class = reflection.class_name.constantize
           ignore_includes
           eager_associations = association_class.find(ids.uniq).to_a
           eager_associations.each do |eager_association|
