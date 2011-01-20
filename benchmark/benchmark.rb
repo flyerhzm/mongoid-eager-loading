@@ -5,7 +5,8 @@ require "mongoid"
 require "mongoid-eager-loading"
 
 Mongoid.configure do |config|
-  config.master = Mongo::Connection.new.db("mongoid_perf_test", :logger => Logger.new($stdout, :info))
+  #config.master = Mongo::Connection.new('localhost', 27018, :logger => Logger.new($stdout)).db("mongoid_perf_test")
+  config.master = Mongo::Connection.new.db("mongoid_perf_test")
 end
 
 Mongoid.master.collection("people").drop
