@@ -37,17 +37,17 @@ module Mongoid
         def setup_associations(documents, reflection)
           case reflection.macro
           when :references_one
-            setup_associations_with_ids(documents, reflection, true)
+            setup_associations_with_ids(documents, reflection)
           when :references_many
-            setup_associations_with_ids(documents, reflection, false)
+            setup_associations_with_ids(documents, reflection)
           when :references_and_referenced_in_many
-            setup_associations_with_foreign_keys(documents, reflection, false)
+            setup_associations_with_foreign_keys(documents, reflection)
           when :referenced_in
-            setup_associations_with_foreign_keys(documents, reflection, true)
+            setup_associations_with_foreign_keys(documents, reflection)
           end
         end
 
-        def setup_associations_with_ids(documents, reflection, one=true)
+        def setup_associations_with_ids(documents, reflection)
           ids = association_ids(documents, reflection)
 
           ignore_includes
@@ -59,7 +59,7 @@ module Mongoid
           assign_associations(documents, reflection)
         end
 
-        def setup_associations_with_foreign_keys(documents, reflection, one)
+        def setup_associations_with_foreign_keys(documents, reflection)
           ids = association_ids(documents, reflection)
 
           ignore_includes
