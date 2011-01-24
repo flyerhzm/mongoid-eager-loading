@@ -37,17 +37,17 @@ module Mongoid
         def setup_associations(documents, reflection)
           case reflection.macro
           when :references_one
-            setup_associations_with_ids(documents, reflection)
+            setup_associations_with_ids(documents, reflection, true)
           when :references_many
-            setup_associations_with_ids(documents, reflection)
+            setup_associations_with_ids(documents, reflection, false)
           when :references_and_referenced_in_many
-            setup_associations_with_foreign_keys(documents, reflection)
+            setup_associations_with_foreign_keys(documents, reflection, false)
           when :referenced_in
-            setup_associations_with_foreign_keys(documents, reflection)
+            setup_associations_with_foreign_keys(documents, reflection, true)
           end
         end
 
-        def setup_associations_with_ids(documents, reflection)
+        def setup_associations_with_ids(documents, reflection, one)
           ids = association_ids(documents, reflection)
 
           ignore_includes
@@ -56,10 +56,10 @@ module Mongoid
             add_id_association(eager_association.send(reflection.foreign_key), eager_association)
           end
 
-          assign_associations(documents, reflection)
+          assign_associations(documents, reflection, one)
         end
 
-        def setup_associations_with_foreign_keys(documents, reflection)
+        def setup_associations_with_foreign_keys(documents, reflection, one)
           ids = association_ids(documents, reflection)
 
           ignore_includes
@@ -68,7 +68,7 @@ module Mongoid
             add_id_association(eager_association.id, eager_association)
           end
 
-          assign_associations(documents, reflection)
+          assign_associations(documents, reflection, one)
         end
 
         def association_ids(documents, reflection)
@@ -84,15 +84,15 @@ module Mongoid
           ids
         end
 
-        def assign_associations(documents, reflection)
+        def assign_associations(documents, reflection, one)
           id_documents_map.each do |id, documents|
             documents.each do |document|
               key_value = document.send(reflection.key)
               associations = \
-                if key_value.is_a?(Array)
-                  key_value.collect { |v| id_associations_map[v] }
-                else
+                if one
                   id_associations_map[key_value] ? id_associations_map[key_value].first : nil
+                else
+                  to_array(key_value).collect { |v| id_associations_map[v] }.compact.flatten
                 end
               document.instance_variable_set("@#{reflection.name}", associations)
             end
