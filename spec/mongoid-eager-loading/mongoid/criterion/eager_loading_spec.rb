@@ -167,5 +167,21 @@ describe Mongoid::Criterion::EagerLoading do
         @post5.person.should == nil
       end
     end
+
+    it "preload references_many association" do
+      people = Person.all.to_a
+      posts = Post.all.to_a
+
+      criteria = Mongoid::Criteria.new(Person)
+
+      criteria.each do |person|
+        person.posts.should be_an_instance_of Array
+        person.posts.each {|p| p.should be_an_instance_of Post}
+      end
+      criteria.includes(:posts).all.each do |person|
+        person.posts.should be_an_instance_of Array
+        person.posts.each {|p| p.should be_an_instance_of Post}
+      end
+    end
   end
 end
