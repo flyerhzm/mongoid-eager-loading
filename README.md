@@ -1,6 +1,9 @@
 mongoid-eager-loading
 =====================
 
+mongoid-eager-loading is **deprecated** because mongoid has already
+supported eager loading officially.
+
 mongoid-eager-loading adds the eager loading feature for mongoid.
 
 Originally it is my [pull request][0] for mongoid, but it is not accepted yet, so I created this gem to get the eager loading benefits easily for my projects.
